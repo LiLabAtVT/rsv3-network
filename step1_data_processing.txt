@@ -1,0 +1,17 @@
+# This file contains information on the software tools and parameters used for processing (cleaning, mapping, and quantifying) the raw RNA-seq data.
+
+# Raw reads were filtered using Trimmomatic (version 0.30)*. Parameters were set as shown below.
+java -jar <path to trimmomatic.jar> PE -threads <threads> -phred33 -trimlog <logFileR1> <logFileR2> <inputR1> <inputR2> <outputR1> <outputR2> ILLUMINACLIP:<fastaWithAdapters>:2:30:10 LEADING:30 TRAILING:30 MINLEN:50 
+
+# Reads were then mapped to ‘Williams82’ soybean reference genome (Wm82.a2.v1, downloaded from Phytozome)** using STAR (version 2.5.3a)*** using the parameters shown below.
+ ~/bin/STAR --runThreadN <threads> --genomeDir <path to genome directory> --runMode alignReads --alignIntronMax 15000 --readFilesIn <path to R1> <path to R2> --readFilesCommand bzcat --outFileNamePrefix <path to output file directory and prefix> --outSAMtype BAM SortedByCoordinate --outSAMstrandField intronMotif 
+
+# Finally, mapped reads were quantified using featureCounts (version 1.5.3)**** with the following parameters.
+~/bin/featureCounts -T <integer> -p -B -a <annotation.gtf> -t exon -g gene_id -o < counts_ouput.txt> <mapping_results_PE.bam> 
+
+‘’’
+*Bolger AM, Lohse M, Usadel B. Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics. 2014;30(15):2114-20.
+**Schmutz J, Cannon SB, Schlueter J, Ma J, Mitros T, Nelson W, et al. Genome sequence of the palaeopolyploid soybean. Nature. 2010;463(7278):178-83.
+***Dobin A, Davis CA, Schlesinger F, Drenkow J, Zaleski C, Jha S, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics. 2013;29(1):15-21.
+****Liao Y, Smyth GK, Shi W. featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. Bioinformatics. 2013;30(7):923-30.
+‘’’
